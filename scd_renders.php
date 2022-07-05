@@ -554,7 +554,7 @@ function scd_convert_price_in_html_markup($price_html, $price_formatted, $args, 
             // The conversion rate is defined.  We will convert the price and call a function
             // to apply the proper formatting.
             $decimals = scd_options_get_decimal_precision();
-            $converted_price = scd_function_convert_subtotal($unformatted_price, $currency, $target_currency, $decimals);
+            $converted_price = scd_function_convert_subtotal($unformatted_price, $currency, $target_currency);
             $args['currency'] = $target_currency;
             $args['decimals'] = $decimals;
             $args['price_format'] = scd_change_currency_display_format ($args['price_format'], $target_currency);
@@ -1764,16 +1764,20 @@ $product->set_regular_price( isset(reset($prod)['regular_price']) ? scd_function
 												if ( $postcode_count == 1 ) {
 													$value = reset ( $postcode_filter );
 													// Check if Custom fees exist in the wcv teble shipping
-													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
-													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													// $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													// $current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];
 													$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
 													
 												}
 												else {
 													$value = reset ( $state_filter );
 													// Check if Custom fees exist in the wcv teble shipping
-													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
-													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													//$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													//$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];
 													$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
 													
 												}
@@ -1789,21 +1793,54 @@ $product->set_regular_price( isset(reset($prod)['regular_price']) ? scd_function
 												if ( $postcode_count == 1 ) {
 													$value = reset ( $postcode_filter );
 													// Check if Custom fees exist in the wcv teble shipping
-													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
-													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													// $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													// $current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];
 													$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
 													
 												}
 												else {
+													/*
 													foreach( $country_filter as $key => $value){
-														$tmpCost = (float) isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+														// $tmpCost = (float) isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+														$tmpCost = (float) $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
 														if( $tmpCost < $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] ){
 															// Check if Custom fees exist in the wcv teble shipping
-															$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
-															$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+															// $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+															// $current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+															$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+															$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];
 															$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
 														}
 													}
+													*/
+													
+													
+													$tmp_current_data_value = 999999999 ;
+													foreach( $country_filter as $key => $value){
+														$tmpCost = (float) $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+														if( $tmpCost < $tmp_current_data_value ){
+															// Check if Custom fees exist in the wcv teble shipping
+															$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+															$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];
+															$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
+															
+															$tmp_current_data_value = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+														}
+													}
+													foreach( $user_meta as $key => $value){
+														if ( 'EWE' == $value['country']){
+															// $total_shipping_cost = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * $qty : $value['fee'] * $qty;
+															$total_shipping_cost = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+														}
+													}
+													
+													// dump($tmpCost, 'TMP COST: ');
+													// dump($total_shipping_cost, 'TOTAL SHIPPING COST: ');
+								
+								
+								
 												}												
 												
 											}
@@ -1811,61 +1848,15 @@ $product->set_regular_price( isset(reset($prod)['regular_price']) ? scd_function
 									else{
 										foreach( $user_meta as $key => $value){
 											if ( 'EWE' == $value['country']){
-												$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];												
-												$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];					
+												// $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];												
+												// $current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];					
+												$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];												
+												$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];					
 												$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
 										
 											}
 										}
 									}	
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									/*
-									foreach ( $user_meta as $key => $value ) {
-										if (  WC()->customer->get_shipping_country() == $value['country']){
-											if ($order->shipping_city == $value['state']){
-												// Check if Custom fees exist in the wcv teble shipping
-												$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
-												$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
-												$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
-											}
-											else{
-												//$tmpCost = (float) isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
-												//if( $tmpCost < $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] ){
-													// Check if Custom fees exist in the wcv teble shipping
-													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
-													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
-													$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
-												//}
-											}
-											
-										
-										}else{
-											if ( 'EWE' == $value['country']){
-											$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];												
-											$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];					
-											$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
-						
-											}
-										}
-									}
-									*/
 									
 									
 								}else{
@@ -1881,13 +1872,6 @@ $product->set_regular_price( isset(reset($prod)['regular_price']) ? scd_function
 								$user_meta = reset ( get_user_meta($vendor_id, '_wcv_shipping_rates' ));// GET THE WCV SHIPPING TABLE RATES
 
 								if ( $user_meta ) {
-									
-									
-									
-									
-									
-
-
 									
 									$country_filter= find_in_two_dimension_array($user_meta, "country", $order->shipping_country);
 									$country_count = count($country_filter);
@@ -1914,16 +1898,20 @@ $product->set_regular_price( isset(reset($prod)['regular_price']) ? scd_function
 												if ( $postcode_count == 1 ) {
 													$value = reset ( $postcode_filter );
 													// Check if Custom fees exist in the wcv teble shipping
-													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
-													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													// $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													// $current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];
 													$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
 													
 												}
 												else {
 													$value = reset ( $state_filter );
 													// Check if Custom fees exist in the wcv teble shipping
-													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
-													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													// $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													// $current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];
 													$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
 													
 												}
@@ -1940,21 +1928,48 @@ $product->set_regular_price( isset(reset($prod)['regular_price']) ? scd_function
 												if ( $postcode_count == 1 ) {
 													$value = reset ( $postcode_filter );
 													// Check if Custom fees exist in the wcv teble shipping
-													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
-													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													// $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													// $current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+													$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+													$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];
 													$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
 													
 												}
 												else {
+													/*
 													foreach( $country_filter as $key => $value){
-														$tmpCost = (float) isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+														// $tmpCost = (float) isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+														$tmpCost = (float) $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
 														if( $tmpCost < $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] ){
 															// Check if Custom fees exist in the wcv teble shipping
-															$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
-															$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+															// $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+															// $current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];
+															$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+															$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];
 															$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
 														}
 														
+													}
+													*/
+													
+													
+													$tmp_current_data_value = 999999999 ;
+													foreach( $country_filter as $key => $value){
+														$tmpCost = (float) $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+														if( $tmpCost < $tmp_current_data_value ){
+															// Check if Custom fees exist in the wcv teble shipping
+															$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+															$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];
+															$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
+															
+															$tmp_current_data_value = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+														}
+													}
+													foreach( $user_meta as $key => $value){
+														if ( 'EWE' == $value['country']){
+															// $total_shipping_cost = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * $qty : $value['fee'] * $qty;
+															$total_shipping_cost = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];
+														}
 													}
 													
 												}
@@ -1964,8 +1979,10 @@ $product->set_regular_price( isset(reset($prod)['regular_price']) ? scd_function
 									else{
 										foreach( $user_meta as $key => $value){
 											if ( 'EWE' == $value['country']){
-												$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];												
-												$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];					
+												// $current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];												
+												// $current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? $value['fee_in_vendor_currency'] : $value['fee'];					
+												$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'];												
+												$current_data_value['items'][$current_data_value_item_key]['rate']->fee = $value['fee_in_vendor_currency'];					
 												$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
 										
 											}
@@ -1973,42 +1990,23 @@ $product->set_regular_price( isset(reset($prod)['regular_price']) ? scd_function
 									}
 									
 									
-									
-									
-									
-									
-									
-									/*
-									foreach ( $user_meta as $key => $value ) {
-										if (  WC()->customer->get_shipping_country() == $value['country']){
-											// Check if Custom fees exist in the wcv teble shipping
-
-											$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? scd_function_convert_subtotal((float) $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'], reset($prod)['currency'], $target_currency ) : scd_function_convert_subtotal((float) $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'], reset($prod)['currency'], $target_currency );
-											$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? scd_function_convert_subtotal((float) $value['fee_in_vendor_currency'], reset($prod)['currency'], $target_currency ) : scd_function_convert_subtotal((float) $value['fee'], reset($prod)['currency'], $target_currency );
-											$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
-										
-										}else{
-											if ( 'EWE' == $value['country']){
-											$current_data_value['items'][$current_data_value_item_key]['shipping_cost'] = isset($value['fee_in_vendor_currency']) ? scd_function_convert_subtotal((float) $value['fee_in_vendor_currency'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'], reset($prod)['currency'], $target_currency ) : scd_function_convert_subtotal((float) $value['fee'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'], reset($prod)['currency'], $target_currency );												
-											$current_data_value['items'][$current_data_value_item_key]['rate']->fee = isset($value['fee_in_vendor_currency']) ? scd_function_convert_subtotal((float) $value['fee_in_vendor_currency'], reset($prod)['currency'], $target_currency ) : scd_function_convert_subtotal((float) $value['fee'], reset($prod)['currency'], $target_currency );					
-											$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
-						
-											}
-										}
-									}
-									*/
 								}else{
 
 									$total_shipping_cost += $current_data_value['items'][$current_data_value_item_key]['shipping_cost'];
 								}
 											
 								$current_data_value['items'][$current_data_value_item_key]['total_product_cost'] = isset(reset($prod)['regular_price']) ? scd_function_convert_subtotal((float) reset($prod)['regular_price'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'], reset($prod)['currency'], $target_currency ) : scd_function_convert_subtotal((float) $current_data_value['items'][$current_data_value_item_key]['total_product_cost'], reset($prod)['currency'], $target_currency );
+								// $current_data_value['items'][$current_data_value_item_key]['total_product_cost'] = isset(reset($prod)['regular_price']) ? (float) reset($prod)['regular_price'] * WC()->cart->cart_contents[$current_data_value_item_key]['quantity'] : (float) $current_data_value['items'][$current_data_value_item_key]['total_product_cost'];
 								$total_product_cost += $current_data_value['items'][$current_data_value_item_key]['total_product_cost'];
 								
 							}
 		
 						}
 						
+						// dump($target_currency);
+						// dump($total_shipping_cost);
+						// dump($total_product_cost);
+
 						$current_data_value['currency'] = $target_currency;
 						$current_data_value['total_shipping'] = $total_shipping_cost;
 						$current_data_value['total_cost'] = $total_product_cost;
@@ -2023,7 +2021,8 @@ $product->set_regular_price( isset(reset($prod)['regular_price']) ? scd_function
 					
 
                     // For an item of type Shipping, we convert the shipping price
-                    $new_price = apply_filters('scd_convert_subtotal', $item->get_total(), $base_currency, $target_currency, 1);
+                    // $new_price = apply_filters('scd_convert_subtotal', $item->get_total(), $base_currency, $target_currency, 1);
+                    $new_price = $item->get_total();
                     
                     // Set the new price
                     $item->set_total( $new_price );
